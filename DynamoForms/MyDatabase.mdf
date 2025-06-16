@@ -1,0 +1,19 @@
+﻿(function () {
+    'use strict';
+
+    angular
+        .module('app')
+        .controller('MyDatabase', MyDatabase);
+
+    MyDatabase.$inject = ['$location'];
+
+    function MyDatabase($location) {
+        /* jshint validthis:true */
+        var vm = this;
+        vm.title = 'MyDatabase';
+
+        activate();
+
+        function activate() { }
+    }
+})();

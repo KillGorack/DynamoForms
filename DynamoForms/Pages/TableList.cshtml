@@ -1,0 +1,80 @@
+﻿@page
+@model TableListModel
+
+<nav>
+    <strong>Tables:</strong>
+    @foreach (var table in Model.TableNames)
+    {
+        <a href="?table=@table">@table</a>
+        @if (table != Model.TableNames.Last())
+        {
+            @: |
+        }
+    }
+</nav>
+
+<a class="btn btn-primary mb-2" asp-page="TableAdd" asp-route-table="@Model.TableName">Add Record</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            @foreach (var col in Model.Columns)
+            {
+                <th>@col.ColumnName</th>
+            }
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Model.Records)
+        {
+            <tr>
+                @{
+                    var pkCol = Model.Columns.FirstOrDefault(c => c.IsPrimaryKey)?.ColumnName;
+                    var pkVal = pkCol != null && record.ContainsKey(pkCol) ? record[pkCol] : null;
+                }
+                @foreach (var col in Model.Columns)
+                {
+                    <td>
+                        @{
+                            var value = record.ContainsKey(col.ColumnName) ? record[col.ColumnName] : "";
+                            if (col.DataType == "date" && value is not null && value.ToString() != "")
+                            {
+                                // Try to parse and format as date only
+                                DateTime dt;
+                                if (DateTime.TryParse(value.ToString(), out dt))
+                                {
+                                    @dt.ToString("yyyy-MM-dd")
+                                }
+                                else
+                                {
+                                    @value
+                                }
+                            }
+                            else if (col.DataType == "bit")
+                            {
+                                // Handle nulls: checked only if value is 1 (true)
+                                <input type="checkbox" disabled @(Convert.ToBoolean(value ?? false) ? "checked" : "") />
+                            }
+                            else
+                            {
+                                @value
+                            }
+                        }
+                    </td>
+                }
+                <td>
+                    <form method="post" asp-page-handler="Delete" asp-route-table="@Model.TableName" asp-route-id="@pkVal" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</button>
+                    </form>
+                    <a class="btn btn-warning btn-sm"
+                       asp-page="TableEdit"
+                       asp-route-table="@Model.TableName"
+                       asp-route-id="@pkVal">
+                        Edit
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
