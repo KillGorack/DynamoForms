@@ -6,3 +6,5 @@ CRUD stands for Create, Read, Update, Delete. These are the four basic operation
  - Read: Retrieve or view existing records (e.g., displaying data in a list or detail view).
  - Update: Modify existing records (e.g., editing a row’s values).
  - Delete: Remove records (e.g., deleting a row from a table).
+
+Basically we add a table to connected database.. this will pick that up, use meta data from the table to generate forms and views.
