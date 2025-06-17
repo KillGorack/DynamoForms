@@ -79,5 +79,20 @@ namespace DynamoForms.Data
             return result.ToList();
         }
 
+        public async Task<int> GetRecordCountAsync(string tableName)
+        {
+            using var conn = CreateConnection();
+            return await conn.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM [{tableName}]");
+        }
+
+        public async Task<List<Dictionary<string, object>>> GetPagedRecordsAsync(string tableName, int pageNumber, int pageSize)
+        {
+            using var conn = CreateConnection();
+            var offset = (pageNumber - 1) * pageSize;
+            var sql = $"SELECT * FROM [{tableName}] ORDER BY (SELECT NULL) OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            var result = await conn.QueryAsync(sql, new { Offset = offset, PageSize = pageSize });
+            return result.Select(row => (IDictionary<string, object>)row)
+                         .Select(dict => dict.ToDictionary(kv => kv.Key, kv => kv.Value)).ToList();
+        }
     }
 }

@@ -104,3 +104,4 @@ C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\refint\Dyna
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\DynamoForms.pdb
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\DynamoForms.genruntimeconfig.cache
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\ref\DynamoForms.dll
+C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\DynamoForms.sourcelink.json

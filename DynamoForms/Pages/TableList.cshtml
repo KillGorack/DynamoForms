@@ -1,19 +1,9 @@
 ﻿@page
 @model TableListModel
 
-<nav>
-    <strong>Tables:</strong>
-    @foreach (var table in Model.TableNames)
-    {
-        <a href="?table=@table">@table</a>
-        @if (table != Model.TableNames.Last())
-        {
-            @: |
-        }
-    }
-</nav>
-
 <a class="btn btn-primary mb-2" asp-page="TableAdd" asp-route-table="@Model.TableName">Add Record</a>
+
+<a href="/TableList?table=@Model.TableName&page=2">Go to page 2</a>
 
 <table class="table">
     <thead>
@@ -78,3 +68,63 @@
         }
     </tbody>
 </table>
+
+@if (Model.TotalPages > 1)
+{
+    var startPage = Math.Max(1, Model.PageNumber - 3);
+    var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 3);
+
+    <nav>
+        <ul class="pagination">
+            <!-- First -->
+            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-page="/TableList"
+                   asp-route-table="@Model.TableName"
+                   asp-route-pageNumber="1" title="First">
+                    &#171; <!-- « -->
+                </a>
+            </li>
+            <!-- Previous -->
+            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-page="/TableList"
+                   asp-route-table="@Model.TableName"
+                   asp-route-pageNumber="@(Model.PageNumber - 1)" title="Previous">
+                    &#8249; <!-- ‹ -->
+                </a>
+            </li>
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       asp-page="/TableList"
+                       asp-route-table="@Model.TableName"
+                       asp-route-pageNumber="@i">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-page="/TableList"
+                   asp-route-table="@Model.TableName"
+                   asp-route-pageNumber="@(Model.PageNumber + 1)" title="Next">
+                    &#8250; <!-- › -->
+                </a>
+            </li>
+            <!-- Last -->
+            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-page="/TableList"
+                   asp-route-table="@Model.TableName"
+                   asp-route-pageNumber="@Model.TotalPages" title="Last">
+                    &#187; <!-- » -->
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

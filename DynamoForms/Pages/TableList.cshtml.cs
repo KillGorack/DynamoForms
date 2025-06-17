@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Dapper;
 using DynamoForms.Data;
+using System;
 
 public class TableListModel : PageModel
 {
@@ -20,15 +21,22 @@ public class TableListModel : PageModel
     public string TableName { get; set; }
     public List<TableColumnMeta> Columns { get; set; }
     public List<Dictionary<string, object>> Records { get; set; }
+    public int PageNumber { get; set; } = 1;
+    public int PageSize { get; set; } = 10; // Or any default page size you want
+    public int TotalRecords { get; set; }
+    public int TotalPages => (int)Math.Ceiling((double)TotalRecords / PageSize);
 
-    public async Task OnGetAsync(string table = null)
+    public async Task OnGetAsync(string table = null, int pageNumber = 1)
     {
         TableNames = await _dbHelper.GetAllTableNamesAsync();
         TableName = table ?? TableNames.FirstOrDefault();
+        PageNumber = pageNumber;
+
         if (TableName != null)
         {
             Columns = await _dbHelper.GetTableMetaAsync(TableName);
-            Records = await _dbHelper.GetAllRecordsAsync(TableName);
+            TotalRecords = await _dbHelper.GetRecordCountAsync(TableName);
+            Records = await _dbHelper.GetPagedRecordsAsync(TableName, PageNumber, PageSize);
         }
     }
 
