@@ -22,21 +22,25 @@ public class TableListModel : PageModel
     public List<TableColumnMeta> Columns { get; set; }
     public List<Dictionary<string, object>> Records { get; set; }
     public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10; // Or any default page size you want
+    public int PageSize { get; set; } = 15;
     public int TotalRecords { get; set; }
     public int TotalPages => (int)Math.Ceiling((double)TotalRecords / PageSize);
+    public string SortColumn { get; set; }
+    public bool SortDescending { get; set; }
 
-    public async Task OnGetAsync(string table = null, int pageNumber = 1)
+    public async Task OnGetAsync(string table = null, int pageNumber = 1, string sortColumn = null, bool sortDesc = false)
     {
         TableNames = await _dbHelper.GetAllTableNamesAsync();
         TableName = table ?? TableNames.FirstOrDefault();
         PageNumber = pageNumber;
+        SortColumn = sortColumn;
+        SortDescending = sortDesc;
 
         if (TableName != null)
         {
             Columns = await _dbHelper.GetTableMetaAsync(TableName);
             TotalRecords = await _dbHelper.GetRecordCountAsync(TableName);
-            Records = await _dbHelper.GetPagedRecordsAsync(TableName, PageNumber, PageSize);
+            Records = await _dbHelper.GetPagedRecordsAsync(TableName, PageNumber, PageSize, SortColumn, SortDescending);
         }
     }
 

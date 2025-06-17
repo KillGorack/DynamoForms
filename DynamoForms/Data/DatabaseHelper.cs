@@ -94,5 +94,19 @@ namespace DynamoForms.Data
             return result.Select(row => (IDictionary<string, object>)row)
                          .Select(dict => dict.ToDictionary(kv => kv.Key, kv => kv.Value)).ToList();
         }
+
+        public async Task<List<Dictionary<string, object>>> GetPagedRecordsAsync(
+            string tableName, int pageNumber, int pageSize, string sortColumn, bool sortDescending)
+        {
+            using var conn = CreateConnection();
+            var offset = (pageNumber - 1) * pageSize;
+            var orderBy = !string.IsNullOrEmpty(sortColumn)
+                ? $"[{sortColumn}] {(sortDescending ? "DESC" : "ASC")}"
+                : "(SELECT NULL)";
+            var sql = $"SELECT * FROM [{tableName}] ORDER BY {orderBy} OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            var result = await conn.QueryAsync(sql, new { Offset = offset, PageSize = pageSize });
+            return result.Select(row => (IDictionary<string, object>)row)
+                         .Select(dict => dict.ToDictionary(kv => kv.Key, kv => kv.Value)).ToList();
+        }
     }
 }
