@@ -14,7 +14,22 @@ public class NaviViewComponent : ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        List<string> tableNames = await _dbHelper.GetAllTableNamesAsync();
-        return View(tableNames);
+        // Use FetchDataAsync to get all enabled applications
+        var sql = "SELECT Name, Var FROM Application WHERE Enabled = 1 ORDER BY Name";
+        var result = await _dbHelper.FetchDataAsync(sql, 2);
+
+        var apps = new List<(string Name, string Var)>();
+        if (result is List<Dictionary<string, object>> rows)
+        {
+            foreach (var row in rows)
+            {
+                apps.Add((
+                    row["Name"]?.ToString() ?? "",
+                    row["Var"]?.ToString() ?? ""
+                ));
+            }
+        }
+
+        return View(apps);
     }
 }

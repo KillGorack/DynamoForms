@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/Functions/Edit"
 @model TableEditModel
 
 <h2>Edit Record (@Model.EditId) in @Model.TableName</h2>
@@ -48,7 +48,7 @@
         </div>
     }
     <button type="submit" class="btn btn-success">Save</button>
-    <a class="btn btn-secondary" asp-page="TableList" asp-route-table="@Model.TableName">Cancel</a>
+    <a class="btn btn-secondary" asp-page="/Content/List" asp-route-app="@Model.TableName">Cancel</a>
 </form>
 @if (!string.IsNullOrEmpty(Model.Message))
 {

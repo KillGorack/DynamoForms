@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace DynamoForms.Pages
+namespace DynamoForms.Pages.Content
 {
     public class PrivacyModel : PageModel
     {

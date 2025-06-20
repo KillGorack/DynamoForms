@@ -1,0 +1,232 @@
+﻿@page "/Content/List"
+@model TableListModel
+@functions {
+    string BuildFilterQuery(Dictionary<string, string> filters)
+    {
+        var list = new List<string>();
+        foreach (var filter in filters)
+        {
+            if (!string.IsNullOrWhiteSpace(filter.Value))
+            {
+                list.Add($"filter_{filter.Key}={Uri.EscapeDataString(filter.Value)}");
+            }
+        }
+        return string.Join("&", list);
+    }
+}
+
+<a class="btn btn-primary mb-2"
+   asp-page="/Functions/Add"
+   asp-route-table="@Model.TableName"
+   asp-route-app="@Model.TableName">
+    Add Record
+</a>
+
+@if (Model.Registry != null
+    && Model.Registry.Settings != null
+    && Model.Registry.Settings.TryGetValue("Blurb", out var blurbObj)
+    && !string.IsNullOrWhiteSpace(blurbObj?.ToString()))
+{
+    <div class="alert alert-info mb-3">
+        @blurbObj
+    </div>
+}
+
+
+<table class="table table-sm">
+    <form method="get">
+        <input type="hidden" name="app" value="@Model.TableName" />
+        <input type="hidden" name="table" value="@Model.TableName" />
+        <thead>
+            <tr>
+                @foreach (var col in Model.Columns.Where(c => !c.IsPrimaryKey)) // Exclude primary key column
+                {
+                    <th>
+                        @{
+                            var filterVal = Request.Query[$"filter_{col.ColumnName}"];
+                        }
+                        @if (col.DataType == "date")
+                        {
+                            <input type="date" name="filter_@col.ColumnName" value="@filterVal" class="form-control form-control-sm" />
+                        }
+                        else if (col.DataType == "bit")
+                        {
+                            <select name="filter_@col.ColumnName" class="form-select form-select-sm">
+                                @if (string.IsNullOrEmpty(filterVal))
+                                {
+                                    <option value="" selected>All</option>
+                                }
+                                else
+                                {
+                                    <option value="">All</option>
+                                }
+                                @if (filterVal == "true")
+                                {
+                                    <option value="true" selected>Yes</option>
+                                }
+                                else
+                                {
+                                    <option value="true">Yes</option>
+                                }
+                                @if (filterVal == "false")
+                                {
+                                    <option value="false" selected>No</option>
+                                }
+                                else
+                                {
+                                    <option value="false">No</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <input type="text" name="filter_@col.ColumnName" value="@filterVal" class="form-control form-control-sm" />
+                        }
+                    </th>
+                }
+                <th>
+                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                </th>
+            </tr>
+            <tr>
+                @foreach (var col in Model.Columns.Where(c => !c.IsPrimaryKey)) // Exclude primary key column
+                {
+                    var isSorted = Model.SortColumn == col.ColumnName;
+                    var nextSortDesc = isSorted ? !Model.SortDescending : false;
+                    var sortIcon = isSorted
+                        ? (Model.SortDescending ? "&#8595;" : "&#8593;")
+                        : "";
+
+                    <th>
+                        <a asp-page="/Content/List"
+                           asp-route-app="@Model.TableName"
+                           asp-route-pageNumber="@Model.PageNumber"
+                           asp-route-sortColumn="@col.ColumnName"
+                           asp-route-sortDesc="@nextSortDesc"
+                           style="text-decoration:none;">
+                            @col.ColumnName @Html.Raw(sortIcon)
+                        </a>
+                    </th>
+                }
+                <th class="fixed-col-width">Actions</th>
+            </tr>
+        </thead>
+    </form>
+    <tbody>
+        @foreach (var record in Model.Records)
+        {
+            <tr>
+                @foreach (var col in Model.Columns.Where(c => !c.IsPrimaryKey)) // Exclude primary key column
+                {
+                    <td>
+                        @{
+                            var value = record.ContainsKey(col.ColumnName) ? record[col.ColumnName] : "";
+                            if (col.DataType == "date" && value is not null && value.ToString() != "")
+                            {
+                                DateTime dt;
+                                if (DateTime.TryParse(value.ToString(), out dt))
+                                {
+                                    @dt.ToString("yyyy-MM-dd")
+                                }
+                                else
+                                {
+                                    @value
+                                }
+                            }
+                            else if (col.DataType == "bit")
+                            {
+                                // Replace checkbox with visual indicators
+                                if (Convert.ToBoolean(value ?? false))
+                                {
+                                    <span class="text-success">&#10003;</span> <!-- Green check -->
+                                }
+                                else
+                                {
+                                    <span class="text-danger">&#10007;</span> <!-- Red X -->
+                                }
+                            }
+                            else
+                            {
+                                @value
+                            }
+                        }
+                    </td>
+                }
+                <td class="fixed-col-width">
+                    <form method="post" asp-page-handler="Delete" asp-route-app="@Model.TableName" asp-route-id="@record[Model.Columns.First(c => c.IsPrimaryKey).ColumnName]" style="display:inline;">
+                        <button type="submit" class="btn btn-sm" title="Delete"
+                                onclick="return confirm('Are you sure you want to delete this record?');">
+                            🗑
+                        </button>
+                    </form>
+
+                    <a class="btn btn-link btn-sm text-warning p-0" title="Edit"
+                       asp-page="/Functions/Edit"
+                       asp-route-app="@Model.TableName"
+                       asp-route-id="@record[Model.Columns.First(c => c.IsPrimaryKey).ColumnName]">
+                        ✏
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@{
+    var filterQuery = BuildFilterQuery(Model.Filters);
+    int startPage = Math.Max(1, Model.PageNumber - 3);
+    int endPage = Math.Min(Model.TotalPages, Model.PageNumber + 3);
+    string baseUrl(int page) =>
+        $"/Content/List/?app={Model.TableName}&pageNumber={page}&sortColumn={Model.SortColumn}&sortDesc={Model.SortDescending}" +
+        (string.IsNullOrEmpty(filterQuery) ? "" : $"&{filterQuery}");
+}
+<div class="d-flex justify-content-between align-items-center mt-2">
+    <div>
+        @if (Model.TotalPages > 1)
+        {
+            <nav>
+                <ul class="pagination mb-0">
+                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           href="@baseUrl(1)"
+                           title="First">
+                            &#171;
+                        </a>
+                    </li>
+                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           href="@baseUrl(Model.PageNumber - 1)"
+                           title="Previous">
+                            &#8249;
+                        </a>
+                    </li>
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link"
+                               href="@baseUrl(i)">
+                                @i
+                            </a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           href="@baseUrl(Model.PageNumber + 1)"
+                           title="Next">
+                            &#8250;
+                        </a>
+                    </li>
+                    <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           href="@baseUrl(Model.TotalPages)"
+                           title="Last">
+                            &#187;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+    <div class="text-end small text-muted">
+        @Model.TotalPages.ToString("N0") Pages (@Model.TotalRecords.ToString("N0") Records)
+    </div>
+</div>

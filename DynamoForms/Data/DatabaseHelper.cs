@@ -1,9 +1,10 @@
+using Dapper;
+using DynamoForms.Data;
+using DynamoForms.Models;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using Dapper;
-using Microsoft.Extensions.Configuration;
-using DynamoForms.Models;
-using DynamoForms.Data;
+using System.Diagnostics;
 
 namespace DynamoForms.Data
 {
@@ -18,10 +19,46 @@ namespace DynamoForms.Data
 
         public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
 
-        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object parameters = null)
+
+        public async Task<object> FetchDataAsync(string sql, int dim = 2, object parameters = null)
         {
-            using var connection = CreateConnection();
-            return await connection.QueryAsync<T>(sql, parameters);
+            using var conn = CreateConnection();
+            try
+            {
+                switch (dim)
+                {
+                    case 0:
+                        // Single value (scalar)
+                        return await conn.ExecuteScalarAsync<object>(sql, parameters);
+
+                    case 1:
+                        // One-dimensional array (single row as dictionary)
+                        var row = await conn.QueryFirstOrDefaultAsync(sql, parameters);
+                        if (row == null) return null;
+                        return ((IDictionary<string, object>)row).ToDictionary(kv => kv.Key, kv => kv.Value);
+
+                    case 2:
+                    default:
+                        // Two-dimensional array (list of dictionaries)
+                        var result = await conn.QueryAsync(sql, parameters);
+                        var list = new List<Dictionary<string, object>>();
+                        foreach (var r in result)
+                        {
+                            var dict = new Dictionary<string, object>();
+                            foreach (var prop in r)
+                            {
+                                dict[prop.Key] = prop.Value;
+                            }
+                            list.Add(dict);
+                        }
+                        return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Database error: {ex.Message}");
+                return null;
+            }
         }
 
         public async Task<List<TableColumnMeta>> GetTableMetaAsync(string tableName)
@@ -50,25 +87,39 @@ namespace DynamoForms.Data
 
             using var conn = CreateConnection();
             var meta = await conn.QueryAsync<TableColumnMeta>(sql, new { TableName = tableName });
+
             return meta.ToList();
         }
 
-        public async Task<List<Dictionary<string, object>>> GetAllRecordsAsync(string tableName)
+        public async Task<int> GetFilteredRecordCountAsync(
+            string tableName, Dictionary<string, string> filters, List<TableColumnMeta> columns)
         {
-            var sql = $"SELECT * FROM [{tableName}]";
             using var conn = CreateConnection();
-            var result = await conn.QueryAsync(sql);
-            var list = new List<Dictionary<string, object>>();
-            foreach (var row in result)
+            var whereClauses = new List<string>();
+            var parameters = new DynamicParameters();
+            foreach (var filter in filters)
             {
-                var dict = new Dictionary<string, object>();
-                foreach (var prop in row)
+                if (!string.IsNullOrWhiteSpace(filter.Value))
                 {
-                    dict[prop.Key] = prop.Value;
+                    var columnMeta = columns.FirstOrDefault(c => c.ColumnName == filter.Key);
+                    if (columnMeta != null && columnMeta.DataType == "bit")
+                    {
+                        if (filter.Value == "true" || filter.Value == "false")
+                        {
+                            whereClauses.Add($"[{filter.Key}] = @filter_{filter.Key}");
+                            parameters.Add($"filter_{filter.Key}", filter.Value == "true" ? 1 : 0);
+                        }
+                    }
+                    else
+                    {
+                        whereClauses.Add($"[{filter.Key}] LIKE @filter_{filter.Key}");
+                        parameters.Add($"filter_{filter.Key}", $"%{filter.Value}%");
+                    }
                 }
-                list.Add(dict);
             }
-            return list;
+            var whereSql = whereClauses.Count > 0 ? "WHERE " + string.Join(" AND ", whereClauses) : "";
+            var sql = $"SELECT COUNT(*) FROM [{tableName}] {whereSql}";
+            return await conn.ExecuteScalarAsync<int>(sql, parameters);
         }
 
         public async Task<List<string>> GetAllTableNamesAsync()
@@ -79,32 +130,46 @@ namespace DynamoForms.Data
             return result.ToList();
         }
 
-        public async Task<int> GetRecordCountAsync(string tableName)
-        {
-            using var conn = CreateConnection();
-            return await conn.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM [{tableName}]");
-        }
-
-        public async Task<List<Dictionary<string, object>>> GetPagedRecordsAsync(string tableName, int pageNumber, int pageSize)
-        {
-            using var conn = CreateConnection();
-            var offset = (pageNumber - 1) * pageSize;
-            var sql = $"SELECT * FROM [{tableName}] ORDER BY (SELECT NULL) OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-            var result = await conn.QueryAsync(sql, new { Offset = offset, PageSize = pageSize });
-            return result.Select(row => (IDictionary<string, object>)row)
-                         .Select(dict => dict.ToDictionary(kv => kv.Key, kv => kv.Value)).ToList();
-        }
-
         public async Task<List<Dictionary<string, object>>> GetPagedRecordsAsync(
-            string tableName, int pageNumber, int pageSize, string sortColumn, bool sortDescending)
+            string tableName, int pageNumber, int pageSize, string sortColumn, bool sortDescending, Dictionary<string, string> filters, List<TableColumnMeta> columns)
         {
             using var conn = CreateConnection();
             var offset = (pageNumber - 1) * pageSize;
             var orderBy = !string.IsNullOrEmpty(sortColumn)
                 ? $"[{sortColumn}] {(sortDescending ? "DESC" : "ASC")}"
                 : "(SELECT NULL)";
-            var sql = $"SELECT * FROM [{tableName}] ORDER BY {orderBy} OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-            var result = await conn.QueryAsync(sql, new { Offset = offset, PageSize = pageSize });
+
+            var whereClauses = new List<string>();
+            var parameters = new DynamicParameters();
+            foreach (var filter in filters)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.Value))
+                {
+                    var columnMeta = columns.FirstOrDefault(c => c.ColumnName == filter.Key);
+                    if (columnMeta != null && columnMeta.DataType == "bit")
+                    {
+                        // Only filter if value is "true" or "false"
+                        if (filter.Value == "true" || filter.Value == "false")
+                        {
+                            whereClauses.Add($"[{filter.Key}] = @filter_{filter.Key}");
+                            parameters.Add($"filter_{filter.Key}", filter.Value == "true" ? 1 : 0);
+                        }
+                    }
+                    else
+                    {
+                        whereClauses.Add($"[{filter.Key}] LIKE @filter_{filter.Key}");
+                        parameters.Add($"filter_{filter.Key}", $"%{filter.Value}%");
+                    }
+                }
+            }
+            var whereSql = whereClauses.Count > 0 ? "WHERE " + string.Join(" AND ", whereClauses) : "";
+
+            var sql = $"SELECT * FROM [{tableName}] {whereSql} ORDER BY {orderBy} OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+
+            parameters.Add("Offset", offset);
+            parameters.Add("PageSize", pageSize);
+
+            var result = await conn.QueryAsync(sql, parameters);
             return result.Select(row => (IDictionary<string, object>)row)
                          .Select(dict => dict.ToDictionary(kv => kv.Key, kv => kv.Value)).ToList();
         }
