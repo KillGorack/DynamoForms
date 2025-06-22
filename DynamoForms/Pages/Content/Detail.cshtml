@@ -4,59 +4,89 @@
     ViewData["Title"] = "Detail View";
 }
 
-<h1>Detail View</h1>
-
 @if (Model.Registry != null && Model.Registry.Fields != null)
 {
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Field</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var field in Model.Registry.Fields)
-            {
-                var normalizedKey = field.Key.ToLower(); // Normalize the key for comparison
-                if (Model.Record.ContainsKey(field.Key))
-                {
-                    <tr>
-                        <td>@(field.Value.Label ?? field.Value.Name)</td>
-                        <td>
-                            @if (field.Value.Type == "date" && Model.Record.ContainsKey(field.Key))
-                            {
-                                DateTime dt;
-                                if (DateTime.TryParse(Model.Record[field.Key]?.ToString(), out dt))
+    <div class="container">
+        <div class="row align-items-start">
+            <!-- Card for Record Details -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Record Details</span>
+                        <div class="ms-auto d-flex gap-2">
+                            <!-- Edit Button -->
+                            <a class="btn btn-link btn-sm text-warning p-0 ico_down" title="Edit"
+                               asp-page="/Functions/Edit"
+                               asp-route-app="@Model.Registry.Settings["Var"]"
+                               asp-route-id="@Model.Record["ID"]">
+                                ✏
+                            </a>
+
+                            <!-- Delete Button -->
+                            <form method="post" asp-page-handler="Delete" asp-route-app="@Model.Registry.Settings["Var"]" asp-route-id="@Model.Record["ID"]" style="display:inline;">
+                                <button type="submit" class="btn btn-sm text-danger p-0" title="Delete"
+                                        onclick="return confirm('Are you sure you want to delete this record?');">
+                                    🗑
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tbody>
+                                @foreach (var field in Model.Registry.Fields)
                                 {
-                                    @dt.ToString("yyyy-MM-dd")
+                                    var normalizedKey = field.Key.ToLower(); // Normalize the key for comparison
+                                    if (Model.Record.ContainsKey(field.Key))
+                                    {
+                                        <tr>
+                                            <td>@(field.Value.Label ?? field.Value.Name)</td>
+                                            <td>
+                                                @if (field.Value.Type == "date" && Model.Record.ContainsKey(field.Key))
+                                                {
+                                                    DateTime dt;
+                                                    if (DateTime.TryParse(Model.Record[field.Key]?.ToString(), out dt))
+                                                    {
+                                                        @dt.ToString("yyyy-MM-dd")
+                                                    }
+                                                    else
+                                                    {
+                                                        @Model.Record[field.Key]
+                                                    }
+                                                }
+                                                else if (field.Value.Type == "bit" && Model.Record.ContainsKey(field.Key))
+                                                {
+                                                    @if (Convert.ToBoolean(Model.Record[field.Key] ?? false))
+                                                    {
+                                                        <span class="text-success">&#10003;</span> <!-- Green check -->
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-danger">&#10007;</span> <!-- Red X -->
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @(Model.Record.ContainsKey(field.Key) ? Model.Record[field.Key] : "N/A")
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
                                 }
-                                else
-                                {
-                                    @Model.Record[field.Key]
-                                }
-                            }
-                            else if (field.Value.Type == "bit" && Model.Record.ContainsKey(field.Key))
-                            {
-                                @if (Convert.ToBoolean(Model.Record[field.Key] ?? false))
-                                {
-                                    <span class="text-success">&#10003;</span> <!-- Green check -->
-                                }
-                                else
-                                {
-                                    <span class="text-danger">&#10007;</span> <!-- Red X -->
-                                }
-                            }
-                            else
-                            {
-                                @(Model.Record.ContainsKey(field.Key) ? Model.Record[field.Key] : "N/A")
-                            }
-                        </td>
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder for Thumbnail -->
+            <div class="col-md-6">
+                <div class="thumbnail-container bg-light text-center h-100 d-flex align-items-center justify-content-center" style="border: 1px dashed #ccc;">
+                    <span class="text-muted">Thumbnail Placeholder</span>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 else
 {

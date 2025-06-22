@@ -37,3 +37,13 @@ body {
     white-space: nowrap;
     text-align:center;
 }
+
+.table_cell_fixer td {
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+.ico_down{
+    position: relative;
+    top: 3px;
+}

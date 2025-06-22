@@ -2,7 +2,7 @@
 
 @if (!string.IsNullOrEmpty(Model) && Model != "default")
 {
-    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+    <nav class="navbar navbar-expand-sm navbar-dark mt-0 mb-3 p-0">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#secondaryNav" aria-controls="secondaryNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -11,34 +11,34 @@
                 <ul class="navbar-nav">
                     <!-- Content Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="contentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle pt-0 pb-0" href="#" id="contentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Content
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="contentDropdown">
-                            <li><a class="dropdown-item" href="/">Home</a></li>
-                            <li><a class="dropdown-item" href="/Content/List?app=@Model">List</a></li>
-                            <li><a class="dropdown-item" href="/Content/Calendar?app=@Model">Calendar</a></li>
+                        <ul class="dropdown-menu bg-dark m-0 p-0" aria-labelledby="contentDropdown">
+                            <li><a class="dropdown-item small" href="/">Home</a></li>
+                            <li><a class="dropdown-item small" href="/Content/List?app=@Model">List</a></li>
+                            <li><a class="dropdown-item small" href="/Content/Calendar?app=@Model">Calendar</a></li>
                         </ul>
                     </li>
 
                     <!-- Functions Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="functionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle pt-0 pb-0" href="#" id="functionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Functions
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="functionsDropdown">
-                            <li><a class="dropdown-item" href="/Functions/Add?app=@Model">Add Record</a></li>
+                        <ul class="dropdown-menu bg-dark m-0 p-0" aria-labelledby="functionsDropdown">
+                            <li><a class="dropdown-item small" href="/Functions/Add?app=@Model">Add Record</a></li>
                         </ul>
                     </li>
 
                     <!-- Administration Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle pt-0 pb-0" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Administration
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                            <li><a class="dropdown-item" href="/Administration/FieldsEditor?app=@Model">Fields Editor</a></li>
-                            <li><a class="dropdown-item" href="/Administration/AppSettings?app=@Model">App Settings</a></li>
+                        <ul class="dropdown-menu bg-dark m-0 p-0" aria-labelledby="adminDropdown">
+                            <li><a class="dropdown-item small" href="/Administration/FieldsEditor?app=@Model">Fields Editor</a></li>
+                            <li><a class="dropdown-item small" href="/Administration/AppSettings?app=@Model">App Settings</a></li>
                         </ul>
                     </li>
                 </ul>

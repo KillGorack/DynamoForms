@@ -15,7 +15,7 @@
     }
 }
 
-<table class="table table-sm">
+<table class="table table-sm table-striped table_cell_fixer">
     <form method="get">
         <input type="hidden" name="app" value="@Model.TableName" />
         <input type="hidden" name="table" value="@Model.TableName" />
@@ -66,7 +66,7 @@
                         }
                     </th>
                 }
-                <th>
+                <th colspan="2">
                     <button type="submit" class="btn btn-sm btn-primary">Filter</button>
                 </th>
             </tr>
