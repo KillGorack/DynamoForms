@@ -1,4 +1,9 @@
 wwwroot\css\site.css
+wwwroot\favicon.ico
+wwwroot\img\ico\PX5_LOGO.ico
+wwwroot\img\ico\PX5_LOGO.svg
+wwwroot\img\ico\PX5_LOGO_WHITE.ico
+wwwroot\img\ico\PX5_LOGO_WHITE.svg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
@@ -60,11 +65,6 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
-wwwroot\img\ico\PX5_LOGO.ico
-wwwroot\img\ico\PX5_LOGO.svg
-wwwroot\img\ico\PX5_LOGO_WHITE.svg
-wwwroot\favicon.ico
-wwwroot\img\ico\PX5_LOGO_WHITE.ico
 C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\lib\jquery\dist\jquery.slim.min.js

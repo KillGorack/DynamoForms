@@ -35,8 +35,9 @@ public class TableListModel : abstract_BasePageModel
     public bool SortDescending { get; set; }
     public Dictionary<string, string> Filters { get; set; } = new();
 
-    public async Task OnGetAsync(string table = null, int pageNumber = 1, string sortColumn = null, bool sortDesc = false, string app = null)
+    public async Task<IActionResult> OnGetAsync(string table = null, int pageNumber = 1, string sortColumn = null, bool sortDesc = false, string app = null)
     {
+        // Load table names and set the current table
         TableNames = await _dbHelper.GetAllTableNamesAsync();
         TableName = app ?? TableNames.FirstOrDefault();
         PageNumber = pageNumber;
@@ -48,17 +49,28 @@ public class TableListModel : abstract_BasePageModel
             .Where(q => q.Key.StartsWith("filter_"))
             .ToDictionary(q => q.Key.Substring(7), q => q.Value.ToString());
 
-        if (TableName != null)
+        // Ensure a valid table is selected
+        if (TableName == null)
         {
-            // Use Registry for fields/meta/settings
-            Fields = Registry.Fields;
-            Columns = Registry.Columns;
-
-            // Use Columns for filtering, paging, etc.
-            TotalRecords = await _dbHelper.GetFilteredRecordCountAsync(TableName, Filters, Columns);
-            Records = await _dbHelper.GetPagedRecordsAsync(TableName, PageNumber, PageSize, SortColumn, SortDescending, Filters, Columns);
-
+            return RedirectToPage("/Administration/FieldsEditor");
         }
+
+        // Load fields from the registry
+        Fields = Registry.Fields;
+
+        // Redirect to FieldsEditor if no fields are available
+        if (Fields == null || !Fields.Any())
+        {
+            return RedirectToPage("/Administration/FieldsEditor", new { app = TableName });
+        }
+
+        Columns = Fields.Values.ToList();
+
+        // Fetch records and metadata for the table
+        TotalRecords = await _dbHelper.GetFilteredRecordCountAsync(TableName, Filters, Fields.Values.ToList());
+        Records = await _dbHelper.GetPagedRecordsAsync(TableName, PageNumber, PageSize, SortColumn, SortDescending, Filters, Fields.Values.ToList());
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(string app, string id)

@@ -17,6 +17,7 @@ namespace DynamoForms.Data
         {
             var sql = "SELECT * FROM Application WHERE Var = @Var";
             var parameters = new { Var = tableName };
+
             var result = await _dbHelper.FetchDataAsync(sql, 1, parameters);
 
             return result as Dictionary<string, object> ?? new Dictionary<string, object>();

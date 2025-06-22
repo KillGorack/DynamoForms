@@ -15,38 +15,13 @@
     }
 }
 
-<a class="btn btn-primary mb-2"
-   asp-page="/Functions/Add"
-   asp-route-table="@Model.TableName"
-   asp-route-app="@Model.TableName">
-    Add Record
-</a>
-
-<a class="btn btn-primary mb-2"
-   asp-page="/Administration/FieldsEditor"
-   asp-route-table="@Model.TableName"
-   asp-route-app="@Model.TableName">
-    Fields
-</a>
-
-@if (Model.Registry != null
-    && Model.Registry.Settings != null
-    && Model.Registry.Settings.TryGetValue("Blurb", out var blurbObj)
-    && !string.IsNullOrWhiteSpace(blurbObj?.ToString()))
-{
-    <div class="alert alert-info mb-3">
-        @blurbObj
-    </div>
-}
-
-
 <table class="table table-sm">
     <form method="get">
         <input type="hidden" name="app" value="@Model.TableName" />
         <input type="hidden" name="table" value="@Model.TableName" />
         <thead>
             <tr>
-                @foreach (var col in Model.Columns.Where(c => !c.IsPrimaryKey)) // Exclude primary key column
+                @foreach (var col in Model.Columns.Where(c => c.Label != "ID")) // Exclude primary key column
                 {
                     <th>
                         @{
@@ -122,8 +97,8 @@
 <tbody>
     @foreach (var record in Model.Records)
     {
-        var primaryKey = Model.Columns.First(c => c.IsPrimaryKey).Label; // Get the primary key column name
-        var recordId = record[primaryKey]; // Get the primary key value for the current record
+           var primaryKey = "ID"; // Get the primary key column name
+           var recordId = record[primaryKey]; // Get the primary key value for the current record
 
         <tr onclick="window.location.href='@Url.Page("/Content/Detail", new { id = recordId, app = Model.TableName })'" style="cursor: pointer;">
             @foreach (var col in Model.Columns.Where(c => !c.IsPrimaryKey)) // Exclude primary key column

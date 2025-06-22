@@ -31,6 +31,7 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @await Component.InvokeAsync("Navii")
             @RenderBody()
         </main>
     </div>
@@ -40,22 +41,22 @@
             &copy; 2025 - DynamoForms - <a asp-area="" asp-page="/Privacy" class="text-light">Privacy</a>
         </div>
     </footer>
-    @{
-        var registry = ViewData["Registry"] as DynamoForms.Data.AppRegistry;
-    }
-    @if (registry != null)
-    {
-        <div class="container mt-3">
-            <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#registryCollapse" aria-expanded="false" aria-controls="registryCollapse">
-                Toggle Registry
-            </button>
-            <div class="collapse mt-2" id="registryCollapse">
-                <pre class="bg-dark text-light p-3 rounded" style="max-height: 300px; overflow-y: auto;">
-                    @System.Text.Json.JsonSerializer.Serialize(registry, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
-                </pre>
-            </div>
+    @* @{
+    var registry = ViewData["Registry"] as DynamoForms.Data.AppRegistry;
+}
+@if (registry != null)
+{
+    <div class="container mt-3">
+        <button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#registryCollapse" aria-expanded="false" aria-controls="registryCollapse">
+            Toggle Registry
+        </button>
+        <div class="collapse mt-2" id="registryCollapse">
+            <pre class="bg-dark text-light p-3 rounded" style="max-height: 300px; overflow-y: auto;">
+                @System.Text.Json.JsonSerializer.Serialize(registry, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
+            </pre>
         </div>
-    }
+    </div>
+} *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

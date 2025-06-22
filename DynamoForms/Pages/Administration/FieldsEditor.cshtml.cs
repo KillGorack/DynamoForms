@@ -41,7 +41,7 @@ namespace DynamoForms.Pages.Administration
             }
 
             // Retrieve the app ID from the Registry
-            if (!Registry.Settings.TryGetValue("Id", out var appIdValue) || appIdValue is not int appId)
+            if (!Registry.Settings.TryGetValue("ID", out var appIdValue) || appIdValue is not int appId)
             {
                 throw new Exception("The 'ID' key is missing or not an integer in the Registry.Settings.");
             }
@@ -72,18 +72,18 @@ namespace DynamoForms.Pages.Administration
                 foreach (var field in fields)
                 {
                     var sqlInsert = @"
-                    INSERT INTO fld (fld_app, fld_human, fld_column, fld_enable, fld_type, fld_length, fld_precision, fld_opt)
-                    VALUES (@AppId, @HumanName, @ColumnName, @Enabled, @Type, @Length, @Precision, @Required)";
+            INSERT INTO fld (fld_app, fld_human, fld_column, fld_enable, fld_type, fld_length, fld_precision, fld_opt)
+            VALUES (@AppId, @HumanName, @ColumnName, @Enabled, @Type, @Length, @Precision, @Required)";
                     var insertParameters = new
                     {
                         AppId = _appId,
-                        HumanName = field.Label,
-                        ColumnName = field.Label,
-                        Enabled = false,
-                        Type = field.Type,
-                        Length = field.Length?.ToString(),
-                        Precision = (string)null,
-                        Required = field.IsNullable,
+                        HumanName = field["ColumnName"]?.ToString(), // Use ColumnName as HumanName
+                        ColumnName = field["ColumnName"]?.ToString(),
+                        Enabled = true,
+                        Type = field["DataType"]?.ToString(),
+                        Length = field["MaxLength"]?.ToString(),
+                        Precision = field["NumericPrecision"]?.ToString(),
+                        Required = field["Required"] != null && Convert.ToBoolean(field["Required"])
                     };
 
                     await _databaseHelper.ExecuteAsync(sqlInsert, insertParameters);
@@ -165,40 +165,53 @@ namespace DynamoForms.Pages.Administration
 
         private async Task UpdateRecordAsync(int recordId, Dictionary<string, object> attributes)
         {
-            Console.WriteLine($"UpdateRecordAsync called for Record ID: {recordId}");
+
+
+            Console.WriteLine($"Updating record with ID: {recordId}");
+            Console.WriteLine("Attributes being updated:");
+            foreach (var attribute in attributes)
+            {
+                Console.WriteLine($"Key: {attribute.Key}, Value: {attribute.Value}");
+            }
 
             // Add the record ID to the attributes dictionary
             attributes["ID"] = recordId;
 
+            // Ensure Enabled is passed as 0 or 1
+            if (attributes.ContainsKey("Enabled"))
+            {
+                attributes["Enabled"] = attributes["Enabled"] is bool enabled && enabled ? 1 : 0;
+            }
+
             // Define default values for all expected parameters
             var defaultValues = new Dictionary<string, object>
             {
-                { "HumanName", "" },
-                { "ColumnName", "" },
-                { "Enabled", false },
+                { "Name", "" },
+                { "Label", "" },
+                { "Enabled", 0 }, // Default to 0 (false)
                 { "Type", "" },
                 { "Length", "" },
                 { "Precision", "" },
-                { "Required", false },
-                { "Option", false },
+                { "IsNullable", false },
+                { "IsOption", false },
                 { "IconSet", "" },
                 { "Regex", "" },
                 { "UnitOfMeasure", "" },
                 { "Placeholder", "" },
-                { "UserId", false },
-                { "Link", false },
-                { "Index", false },
-                { "Detail", false },
-                { "Form", false },
+                { "IsUserId", false },
+                { "IsLink", false },
+                { "ShowInList", false },
+                { "ShowInDetail", false },
+                { "ShowInForm", false },
                 { "Order", 0 },
-                { "Title", false },
-                { "Password", false },
-                { "Double", false },
-                { "Encrypt", false },
-                { "Time", false },
-                { "Image", false },
-                { "Unique", false },
-                { "Json", false }
+                { "IsTitle", false },
+                { "IsPassword", false },
+                { "IsDouble", false },
+                { "IsEncrypted", false },
+                { "IsTime", false },
+                { "IsImage", false },
+                { "IsUnique", false },
+                { "IsJson", false }
             };
 
             foreach (var key in defaultValues.Keys)
@@ -212,33 +225,40 @@ namespace DynamoForms.Pages.Administration
             var sql = @"
             UPDATE fld
             SET 
-                fld_human = @HumanName,
-                fld_column = @ColumnName,
+                fld_human = @Label,
+                fld_column = @Name,
                 fld_enable = @Enabled,
                 fld_type = @Type,
                 fld_length = @Length,
                 fld_precision = @Precision,
-                fld_required = @Required,
-                fld_opt = @Option,
+                fld_required = @IsNullable,
+                fld_opt = @IsOption,
                 fld_icon_set = @IconSet,
                 fld_regex = @Regex,
                 fld_uom = @UnitOfMeasure,
                 fld_placeholder = @Placeholder,
-                fld_usr_ID = @UserId,
-                fld_link = @Link,
-                fld_index = @Index,
-                fld_detail = @Detail,
-                fld_form = @Form,
+                fld_usr_ID = @IsUserId,
+                fld_link = @IsLink,
+                fld_index = @ShowInList,
+                fld_detail = @ShowInDetail,
+                fld_form = @ShowInForm,
                 fld_order = @Order,
-                fld_title = @Title,
-                fld_pass = @Password,
-                fld_double = @Double,
-                fld_encrypt = @Encrypt,
-                fld_time = @Time,
-                fld_image = @Image,
-                fld_unique = @Unique,
-                fld_json = @Json
+                fld_title = @IsTitle,
+                fld_pass = @IsPassword,
+                fld_double = @IsDouble,
+                fld_encrypt = @IsEncrypted,
+                fld_time = @IsTime,
+                fld_image = @IsImage,
+                fld_unique = @IsUnique,
+                fld_json = @IsJson
             WHERE ID = @ID;";
+
+            Console.WriteLine("Executing SQL:");
+            Console.WriteLine(sql);
+            foreach (var param in attributes)
+            {
+                Console.WriteLine($"Parameter: {param.Key} = {param.Value}");
+            }
 
             var success = await _databaseHelper.ExecuteAsync(sql, attributes);
 

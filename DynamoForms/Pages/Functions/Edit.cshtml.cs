@@ -30,15 +30,22 @@ public class TableEditModel : abstract_BasePageModel
     {
         TableName = app;
 
-        // Use Registry directly
-        Columns = Registry.Columns;
+        // Populate Columns manually from Registry.Fields
+        Columns = Registry.Fields.Values.Select(f => new UnifiedField
+        {
+            Label = f.Name,
+            Type = f.Type,
+            IsNullable = f.IsNullable,
+            IsPrimaryKey = f.Name.Equals("ID", StringComparison.OrdinalIgnoreCase),
+            Length = f.Length
+        }).ToList();
 
         // Retrieve the ID from the validated query
         if (Registry.ValidatedQuery.TryGetValue("id", out var idValue) && int.TryParse(idValue?.ToString(), out var id))
         {
             EditId = id;
 
-            var pk = Columns.FirstOrDefault(c => c.IsPrimaryKey)?.Label;
+            var pk = "ID";
             if (pk != null)
             {
                 using var conn = _dbHelper.CreateConnection();
@@ -61,8 +68,15 @@ public class TableEditModel : abstract_BasePageModel
     {
         TableName = app;
 
-        // Use Registry directly
-        Columns = Registry.Columns;
+        // Populate Columns manually from Registry.Fields
+        Columns = Registry.Fields.Values.Select(f => new UnifiedField
+        {
+            Label = f.Name,
+            Type = f.Type,
+            IsNullable = f.IsNullable,
+            IsPrimaryKey = f.Name.Equals("ID", StringComparison.OrdinalIgnoreCase),
+            Length = f.Length
+        }).ToList();
 
         // Retrieve the ID from the validated query
         if (Registry.ValidatedQuery.TryGetValue("id", out var idValue) && int.TryParse(idValue?.ToString(), out var id))
@@ -79,7 +93,7 @@ public class TableEditModel : abstract_BasePageModel
             }
 
             var pk = Columns.FirstOrDefault(c => c.IsPrimaryKey)?.Label;
-            var updateCols = Columns.Where(c => !c.IsPrimaryKey && !c.IsPrimaryKey).Select(c => c.Label).ToList();
+            var updateCols = Columns.Where(c => !c.IsPrimaryKey).Select(c => c.Label).ToList();
             var setClause = string.Join(", ", updateCols.Select(c => $"[{c}] = @{c}"));
 
             var sql = $"UPDATE [{app}] SET {setClause} WHERE [{pk}] = @Id";

@@ -41,7 +41,7 @@ public class DetailModel : abstract_BasePageModel
         }
 
         // Fetch the record from the database
-        var pk = Registry.Columns.FirstOrDefault(c => c.IsPrimaryKey)?.Label;
+        var pk = "ID";
         if (string.IsNullOrWhiteSpace(pk))
         {
             return BadRequest("Primary key column not defined in the registry.");

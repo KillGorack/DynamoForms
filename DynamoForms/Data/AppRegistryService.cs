@@ -32,7 +32,7 @@ namespace DynamoForms.Services
             // Fields (Please work on getting rid of the columns)
             var fieldDefs = new FieldDefinitions(_dbHelper, registry);
             registry.Fields = await fieldDefs.LoadAsync(appVar);
-            registry.Columns = fieldDefs.ToColumnMeta(registry.Fields);
+            //registry.Columns = fieldDefs.ToColumnMeta(registry.Fields);
 
             return registry;
         }

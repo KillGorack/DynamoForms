@@ -19,12 +19,7 @@ public class DeleteService
         var columns = registry.Columns;
         var pk = columns?.FirstOrDefault(c => c.IsPrimaryKey)?.Label;
 
-        if (string.IsNullOrEmpty(pk))
-        {
-            throw new Exception("Primary key not found for the table.");
-        }
-
-        var sql = $"DELETE FROM [{tableName}] WHERE [{pk}] = @Id";
+        var sql = $"DELETE FROM [{tableName}] WHERE [ID] = @Id";
 
         using var conn = _dbHelper.CreateConnection();
         await conn.ExecuteAsync(sql, new { Id = id });

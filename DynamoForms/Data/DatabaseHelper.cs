@@ -78,34 +78,37 @@ namespace DynamoForms.Data
             }
         }
 
-        public async Task<List<UnifiedField>> GetTableMetaAsync(string tableName)
+        public async Task<List<Dictionary<string, object>>> GetTableMetaAsync(string tableName)
         {
             var sql = @"
-                SELECT 
-                    c.COLUMN_NAME as ColumnName,
-                    c.DATA_TYPE as DataType,
-                    CASE c.IS_NULLABLE WHEN 'YES' THEN CAST(0 AS bit) ELSE CAST(1 AS bit) END as Required,
-                    c.CHARACTER_MAXIMUM_LENGTH as MaxLength,
-                    c.COLUMN_DEFAULT as DefaultValue,
-                    c.NUMERIC_PRECISION as NumericPrecision,
-                    c.NUMERIC_SCALE as NumericScale,
-                    COLUMNPROPERTY(object_id(c.TABLE_SCHEMA + '.' + c.TABLE_NAME), c.COLUMN_NAME, 'IsIdentity') as IsIdentity,
-                    CASE WHEN k.COLUMN_NAME IS NOT NULL THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END as IsPrimaryKey
-                FROM INFORMATION_SCHEMA.COLUMNS c
-                LEFT JOIN (
-                    SELECT COLUMN_NAME
-                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-                    WHERE OBJECTPROPERTY(OBJECT_ID(CONSTRAINT_SCHEMA + '.' + CONSTRAINT_NAME), 'IsPrimaryKey') = 1
-                          AND TABLE_NAME = @TableName
-                ) k ON c.COLUMN_NAME = k.COLUMN_NAME
-                WHERE c.TABLE_NAME = @TableName
-                ORDER BY c.ORDINAL_POSITION;
+            SELECT 
+                c.COLUMN_NAME as ColumnName,
+                c.DATA_TYPE as DataType,
+                CASE c.IS_NULLABLE WHEN 'YES' THEN CAST(0 AS bit) ELSE CAST(1 AS bit) END as Required,
+                c.CHARACTER_MAXIMUM_LENGTH as MaxLength,
+                c.COLUMN_DEFAULT as DefaultValue,
+                c.NUMERIC_PRECISION as NumericPrecision,
+                c.NUMERIC_SCALE as NumericScale,
+                COLUMNPROPERTY(object_id(c.TABLE_SCHEMA + '.' + c.TABLE_NAME), c.COLUMN_NAME, 'IsIdentity') as IsIdentity,
+                CASE WHEN k.COLUMN_NAME IS NOT NULL THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END as IsPrimaryKey
+            FROM INFORMATION_SCHEMA.COLUMNS c
+            LEFT JOIN (
+                SELECT COLUMN_NAME
+                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                WHERE OBJECTPROPERTY(OBJECT_ID(CONSTRAINT_SCHEMA + '.' + CONSTRAINT_NAME), 'IsPrimaryKey') = 1
+                        AND TABLE_NAME = @TableName
+            ) k ON c.COLUMN_NAME = k.COLUMN_NAME
+            WHERE c.TABLE_NAME = @TableName
+            ORDER BY c.ORDINAL_POSITION;
             ";
 
             using var conn = CreateConnection();
-            var meta = await conn.QueryAsync<UnifiedField>(sql, new { TableName = tableName });
+            var result = await conn.QueryAsync(sql, new { TableName = tableName });
 
-            return meta.ToList();
+            // Convert the result to a list of dictionaries
+            return result.Select(row => (IDictionary<string, object>)row)
+                         .Select(dict => dict.ToDictionary(kv => kv.Key, kv => kv.Value))
+                         .ToList();
         }
 
         public async Task<int> GetFilteredRecordCountAsync(
