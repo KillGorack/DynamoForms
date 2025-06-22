@@ -19,7 +19,7 @@ else
         <input type="hidden" name="app" value="@Model.TableName" />
         <input type="hidden" name="table" value="@Model.TableName" />
         <div class="accordion" id="fieldsAccordion">
-            @foreach (var group in Model.Attributes.GroupBy(attr => attr.ColumnName))
+            @foreach (var group in Model.Attributes.GroupBy(attr => attr.Label))
             {
                 var collapseId = $"collapse-{group.Key.Replace(" ", "-")}";
                 var headingId = $"heading-{group.Key.Replace(" ", "-")}";
@@ -41,7 +41,7 @@ else
                                 <tbody>
                                     @foreach (var attribute in group)
                                     {
-                                        @foreach (var property in typeof(DynamoForms.Models.FieldAttribute).GetProperties())
+                                        @foreach (var property in typeof(DynamoForms.Models.UnifiedField).GetProperties())
                                         {
                                             <tr>
                                                 <td>@property.Name</td>

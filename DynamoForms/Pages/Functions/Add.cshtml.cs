@@ -19,7 +19,7 @@ public class TableAddModel : abstract_BasePageModel
         _dbHelper = dbHelper;
     }
 
-    public Dictionary<string, DynamicFormField> Fields { get; set; }
+    public Dictionary<string, UnifiedField> Fields { get; set; }
     public string TableName { get; set; }
     public string Message { get; set; }
 

@@ -12,7 +12,7 @@ public class FieldDefinitions
         _registry = registry;
     }
 
-    public async Task<Dictionary<string, DynamicFormField>> LoadAsync(string tableName)
+    public async Task<Dictionary<string, UnifiedField>> LoadAsync(string tableName)
     {
         // Log the settings to the console for debugging
         if (_registry.Settings == null)
@@ -66,10 +66,10 @@ public class FieldDefinitions
         var parameters = new { AppId = appId };
         var fldData = await _dbHelper.FetchDataAsync(sql, parameters: parameters);
 
-        // Map the data to a dictionary of DynamicFormField
+        // Map the data to a dictionary of UnifiedField
         var fields = ((List<Dictionary<string, object>>)fldData).ToDictionary(
             row => row["ColumnName"].ToString(),
-            row => new DynamicFormField
+            row => new UnifiedField
             {
                 Name = row["ColumnName"].ToString(),
                 Type = row["DataType"]?.ToString(),
@@ -103,11 +103,11 @@ public class FieldDefinitions
         return fields;
     }
 
-    public List<TableColumnMeta> ToColumnMeta(Dictionary<string, DynamicFormField> fields)
+    public List<TableColumnMeta> ToColumnMeta(Dictionary<string, UnifiedField> fields)
     {
         if (fields == null) return new List<TableColumnMeta>();
 
-        // Map the DynamicFormField data to TableColumnMeta using the fld table data
+        // Map the UnifiedField data to TableColumnMeta using the fld table data
         return fields.Values.Select(f =>
         {
             return new TableColumnMeta

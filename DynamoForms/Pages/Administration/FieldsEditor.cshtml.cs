@@ -21,7 +21,7 @@ namespace DynamoForms.Pages.Administration
         public string TableName { get; set; }
 
         [BindProperty]
-        public List<FieldAttribute> Attributes { get; set; }
+        public List<UnifiedField> Attributes { get; set; }
 
         public async Task OnGetAsync(string app)
         {
@@ -91,7 +91,7 @@ namespace DynamoForms.Pages.Administration
             }
         }
 
-        private async Task<List<FieldAttribute>> GetAttributesAsync()
+        private async Task<List<UnifiedField>> GetAttributesAsync()
         {
             // SQL query to retrieve all attributes for the specified app
             var sql = "SELECT * FROM fld WHERE fld_app = @AppId";
@@ -100,38 +100,38 @@ namespace DynamoForms.Pages.Administration
             // Fetch data from the database
             var result = await _databaseHelper.FetchDataAsync(sql, dim: 2, parameters) as List<Dictionary<string, object>>;
 
-            // Map the result to a list of FieldAttribute objects
-            return result?.Select(row => new FieldAttribute
+            // Map the result to a list of UnifiedField objects
+            return result?.Select(row => new UnifiedField
             {
                 ID = row.ContainsKey("ID") ? Convert.ToInt32(row["ID"]) : 0,
                 AppId = row.ContainsKey("fld_app") ? Convert.ToInt32(row["fld_app"]) : 0,
-                HumanName = row.ContainsKey("fld_human") ? row["fld_human"]?.ToString() : null,
-                ColumnName = row.ContainsKey("fld_column") ? row["fld_column"]?.ToString() : null,
+                Name = row.ContainsKey("fld_column") ? row["fld_column"]?.ToString() : null,
+                Label = row.ContainsKey("fld_human") ? row["fld_human"]?.ToString() : null,
                 Enabled = row.ContainsKey("fld_enable") && row["fld_enable"] is bool enable ? enable : false,
                 Type = row.ContainsKey("fld_type") ? row["fld_type"]?.ToString() : null,
                 Length = row.ContainsKey("fld_length") ? row["fld_length"]?.ToString() : null,
                 Precision = row.ContainsKey("fld_precision") ? row["fld_precision"]?.ToString() : null,
                 Required = row.ContainsKey("fld_required") && row["fld_required"] is bool required ? required : false,
-                Option = row.ContainsKey("fld_opt") && row["fld_opt"] is bool opt ? opt : false,
+                IsOption = row.ContainsKey("fld_opt") && row["fld_opt"] is bool opt ? opt : false,
                 IconSet = row.ContainsKey("fld_icon_set") ? row["fld_icon_set"]?.ToString() : null,
                 Regex = row.ContainsKey("fld_regex") ? row["fld_regex"]?.ToString() : null,
                 UnitOfMeasure = row.ContainsKey("fld_uom") ? row["fld_uom"]?.ToString() : null,
                 Placeholder = row.ContainsKey("fld_placeholder") ? row["fld_placeholder"]?.ToString() : null,
-                UserId = row.ContainsKey("fld_usr_ID") && row["fld_usr_ID"] is bool userId ? userId : false,
-                Link = row.ContainsKey("fld_link") && row["fld_link"] is bool link ? link : false,
-                Index = row.ContainsKey("fld_index") && row["fld_index"] is bool index ? index : false,
-                Detail = row.ContainsKey("fld_detail") && row["fld_detail"] is bool detail ? detail : false,
-                Form = row.ContainsKey("fld_form") && row["fld_form"] is bool form ? form : false,
+                IsUserId = row.ContainsKey("fld_usr_ID") && row["fld_usr_ID"] is bool userId ? userId : false,
+                IsLink = row.ContainsKey("fld_link") && row["fld_link"] is bool link ? link : false,
+                ShowInList = row.ContainsKey("fld_index") && row["fld_index"] is bool index ? index : false,
+                ShowInDetail = row.ContainsKey("fld_detail") && row["fld_detail"] is bool detail ? detail : false,
+                ShowInForm = row.ContainsKey("fld_form") && row["fld_form"] is bool form ? form : false,
                 Order = row.ContainsKey("fld_order") && row["fld_order"] != DBNull.Value ? Convert.ToInt32(row["fld_order"]) : (int?)null,
-                Title = row.ContainsKey("fld_title") && row["fld_title"] is bool title ? title : false,
-                Password = row.ContainsKey("fld_pass") && row["fld_pass"] is bool password ? password : false,
-                Double = row.ContainsKey("fld_double") && row["fld_double"] is bool doubleValue ? doubleValue : false,
-                Encrypt = row.ContainsKey("fld_encrypt") && row["fld_encrypt"] is bool encrypt ? encrypt : false,
-                Time = row.ContainsKey("fld_time") && row["fld_time"] is bool time ? time : false,
-                Image = row.ContainsKey("fld_image") && row["fld_image"] is bool image ? image : false,
-                Unique = row.ContainsKey("fld_unique") && row["fld_unique"] is bool unique ? unique : false,
-                Json = row.ContainsKey("fld_json") && row["fld_json"] is bool json ? json : false
-            }).ToList() ?? new List<FieldAttribute>();
+                IsTitle = row.ContainsKey("fld_title") && row["fld_title"] is bool title ? title : false,
+                IsPassword = row.ContainsKey("fld_pass") && row["fld_pass"] is bool password ? password : false,
+                IsDouble = row.ContainsKey("fld_double") && row["fld_double"] is bool doubleValue ? doubleValue : false,
+                IsEncrypted = row.ContainsKey("fld_encrypt") && row["fld_encrypt"] is bool encrypt ? encrypt : false,
+                IsTime = row.ContainsKey("fld_time") && row["fld_time"] is bool time ? time : false,
+                IsImage = row.ContainsKey("fld_image") && row["fld_image"] is bool image ? image : false,
+                IsUnique = row.ContainsKey("fld_unique") && row["fld_unique"] is bool unique ? unique : false,
+                IsJson = row.ContainsKey("fld_json") && row["fld_json"] is bool json ? json : false
+            }).ToList() ?? new List<UnifiedField>();
         }
 
         public async Task<IActionResult> OnPostAsync(string app)
