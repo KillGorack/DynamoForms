@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DynamoForms")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f147844a8e21c7d76e08af6d074b0c2790e2a990")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+932a2971242c49fcf326ca66986d964eaec5a22d")]
 [assembly: System.Reflection.AssemblyProductAttribute("DynamoForms")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DynamoForms")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

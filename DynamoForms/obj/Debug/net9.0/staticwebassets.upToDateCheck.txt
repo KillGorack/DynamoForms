@@ -1,5 +1,9 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\img\ico\PX5_LOGO.ico
+wwwroot\img\ico\PX5_LOGO.svg
+wwwroot\img\ico\PX5_LOGO_WHITE.ico
+wwwroot\img\ico\PX5_LOGO_WHITE.svg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
@@ -121,5 +125,9 @@ C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\lib\bootstrap\dist\c
 C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\js\site.js
-C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\favicon.ico
+C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\img\ico\PX5_LOGO.svg
 C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\css\site.css
+C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\img\ico\PX5_LOGO.ico
+C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\favicon.ico
+C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\img\ico\PX5_LOGO_WHITE.svg
+C:\Users\David\source\repos\DynamoForms\DynamoForms\wwwroot\img\ico\PX5_LOGO_WHITE.ico

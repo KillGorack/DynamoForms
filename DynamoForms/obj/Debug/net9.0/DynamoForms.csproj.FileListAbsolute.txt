@@ -29,7 +29,6 @@ C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\rjsmcshtml.
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\scopedcss\Pages\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\scopedcss\bundle\DynamoForms.styles.css
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\scopedcss\projectbundle\DynamoForms.bundle.scp.css
-C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\pkgup72qsi-61n19gt1b8.gz
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\ivwq9fs6wi-xtxxf3hu2r.gz
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\un2cgphb95-bqjiyaj88i.gz
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\5p0ybvt1kj-c2jlpeoesf.gz
@@ -105,3 +104,8 @@ C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\DynamoForms
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\ref\DynamoForms.dll
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\DynamoForms.sourcelink.json
 C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\dsa47zuj7a-mqpaw01exb.gz
+C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\kxbxg6lp32-nnt5tl12na.gz
+C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\09y5wulbu9-hy9w68tarf.gz
+C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\pkgup72qsi-e5mdouait2.gz
+C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\5zfovla1ae-0v14g9dgvm.gz
+C:\Users\David\source\repos\DynamoForms\DynamoForms\obj\Debug\net9.0\compressed\ap56h0uj8l-e5mdouait2.gz

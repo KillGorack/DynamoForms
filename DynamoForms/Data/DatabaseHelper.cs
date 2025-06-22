@@ -61,13 +61,30 @@ namespace DynamoForms.Data
             }
         }
 
+        public async Task<bool> ExecuteAsync(string sql, object parameters = null)
+        {
+            using var conn = CreateConnection();
+            try
+            {
+                await conn.ExecuteAsync(sql, parameters);
+                return true; // Success
+            }
+            catch (Exception ex)
+            {
+                // Add more context to the exception
+                var errorMessage = $"Database error while executing SQL: {sql}. Parameters: {parameters}. Error: {ex.Message}";
+                Debug.WriteLine(errorMessage);
+                throw new Exception(errorMessage, ex); // Rethrow with additional context
+            }
+        }
+
         public async Task<List<TableColumnMeta>> GetTableMetaAsync(string tableName)
         {
             var sql = @"
                 SELECT 
                     c.COLUMN_NAME as ColumnName,
                     c.DATA_TYPE as DataType,
-                    CASE c.IS_NULLABLE WHEN 'YES' THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END as IsNullable,
+                    CASE c.IS_NULLABLE WHEN 'YES' THEN CAST(0 AS bit) ELSE CAST(1 AS bit) END as Required,
                     c.CHARACTER_MAXIMUM_LENGTH as MaxLength,
                     c.COLUMN_DEFAULT as DefaultValue,
                     c.NUMERIC_PRECISION as NumericPrecision,

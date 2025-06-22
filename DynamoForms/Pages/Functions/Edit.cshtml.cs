@@ -113,8 +113,7 @@ public class TableEditModel : abstract_BasePageModel
             using var conn = _dbHelper.CreateConnection();
             await conn.ExecuteAsync(sql, parameters);
 
-            Message = "Record updated!";
-            return RedirectToPage("/Content/List", new { app });
+            return RedirectToPage("/Content/Detail", new { id = EditId, app = TableName });
         }
         else
         {

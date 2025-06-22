@@ -51,9 +51,10 @@ public class TableAddModel : abstract_BasePageModel
             .ToList();
         var insertCols = insertFields.Select(f => f.Name).ToList();
         var paramNames = insertCols.Select(c => "@" + c).ToList();
-
-        var sql = $"INSERT INTO [{app}] ({string.Join(",", insertCols.Select(c => $"[{c}]"))}) VALUES ({string.Join(",", paramNames)})";
-
+        var sql = $@"
+        INSERT INTO [{app}] ({string.Join(",", insertCols.Select(c => $"[{c}]"))})
+        OUTPUT INSERTED.ID
+        VALUES ({string.Join(",", paramNames)})";
         var parameters = new DynamicParameters();
         foreach (var field in insertFields)
         {
@@ -68,11 +69,9 @@ public class TableAddModel : abstract_BasePageModel
                 parameters.Add("@" + field.Name, NewRecord.ContainsKey(field.Name) ? NewRecord[field.Name] : null);
             }
         }
-
         using var conn = _dbHelper.CreateConnection();
-        await conn.ExecuteAsync(sql, parameters);
-
+        int lastInsertedId = await conn.ExecuteScalarAsync<int>(sql, parameters);
         Message = "Record added!";
-        return RedirectToPage("/Content/List", new { app });
+        return RedirectToPage("/Content/Detail", new { id = lastInsertedId, app = TableName });
     }
 }

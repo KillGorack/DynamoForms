@@ -8,5 +8,6 @@ namespace DynamoForms.Models
         public bool IsIdentity { get; set; }
         public bool IsPrimaryKey { get; set; }
         public int? MaxLength { get; set; }
+        public bool Required { get; set; }
     }
 }

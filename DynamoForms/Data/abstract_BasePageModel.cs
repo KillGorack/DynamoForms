@@ -13,11 +13,26 @@ public abstract class abstract_BasePageModel : PageModel
         _registryService = registryService;
     }
 
+
+    private void LogRequestData(Microsoft.AspNetCore.Http.HttpRequest request)
+    {
+        if (request.Method == "POST")
+        {
+            Console.WriteLine("POST Data Debug:");
+            foreach (var key in request.Form.Keys)
+            {
+                Console.WriteLine($"Key: {key}, Value: {request.Form[key]}");
+            }
+        }
+    }
+
+
     public override async Task OnPageHandlerExecutionAsync(
         Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext context,
         Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutionDelegate next)
     {
         var appVar = context.HttpContext.Request.Query["app"].ToString();
+
 
         if (string.IsNullOrEmpty(appVar))
         {

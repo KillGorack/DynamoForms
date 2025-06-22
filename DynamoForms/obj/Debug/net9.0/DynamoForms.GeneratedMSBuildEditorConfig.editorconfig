@@ -20,6 +20,14 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/David/source/repos/DynamoForms/DynamoForms/Pages/Administration/FieldsEditor.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5pc3RyYXRpb25cRmllbGRzRWRpdG9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/David/source/repos/DynamoForms/DynamoForms/Pages/Content/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29udGVudFxEZXRhaWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/David/source/repos/DynamoForms/DynamoForms/Pages/Content/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29udGVudFxFcnJvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

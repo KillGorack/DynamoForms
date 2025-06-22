@@ -1,0 +1,70 @@
+﻿@page "/Administration/FieldsEditor"
+@model DynamoForms.Pages.Administration.FieldsEditorModel
+@{
+    ViewData["Title"] = "Edit Fields";
+}
+
+<h1>Edit Fields for @Model.TableName</h1>
+
+@if (Model.Attributes == null || !Model.Attributes.Any())
+{
+    <p>No fields available to edit.</p>
+}
+else
+{
+    <form method="post" asp-route-app="@Model.TableName" asp-route-table="@Model.TableName" asp-page="/Administration/FieldsEditor">
+
+        @Model.TableName
+        <!-- Hidden input to pass AppId -->
+        <input type="hidden" name="app" value="@Model.TableName" />
+        <input type="hidden" name="table" value="@Model.TableName" />
+        <div class="accordion" id="fieldsAccordion">
+            @foreach (var group in Model.Attributes.GroupBy(attr => attr.ColumnName))
+            {
+                var collapseId = $"collapse-{group.Key.Replace(" ", "-")}";
+                var headingId = $"heading-{group.Key.Replace(" ", "-")}";
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="@headingId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                            @group.Key
+                        </button>
+                    </h2>
+                    <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#fieldsAccordion">
+                        <div class="accordion-body">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Attribute</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var attribute in group)
+                                    {
+                                        @foreach (var property in typeof(DynamoForms.Models.FieldAttribute).GetProperties())
+                                        {
+                                            <tr>
+                                                <td>@property.Name</td>
+                                                <td>
+                                                    @if (property.PropertyType == typeof(bool))
+                                                    {
+                                                        <input type="checkbox" name="Attributes[@(attribute.ID)].@(property.Name)" value="true" @(property.GetValue(attribute) is true ? "checked" : "") />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="text" name="Attributes[@(attribute.ID)].@(property.Name)" value="@(property.GetValue(attribute)?.ToString())" />
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Save</button>
+    </form>
+}

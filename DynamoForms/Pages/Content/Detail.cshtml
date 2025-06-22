@@ -1,0 +1,64 @@
+﻿@page "/Content/Detail"
+@model DetailModel
+@{
+    ViewData["Title"] = "Detail View";
+}
+
+<h1>Detail View</h1>
+
+@if (Model.Registry != null && Model.Registry.Fields != null)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var field in Model.Registry.Fields)
+            {
+                var normalizedKey = field.Key.ToLower(); // Normalize the key for comparison
+                if (Model.Record.ContainsKey(field.Key))
+                {
+                    <tr>
+                        <td>@(field.Value.Label ?? field.Value.Name)</td>
+                        <td>
+                            @if (field.Value.Type == "date" && Model.Record.ContainsKey(field.Key))
+                            {
+                                DateTime dt;
+                                if (DateTime.TryParse(Model.Record[field.Key]?.ToString(), out dt))
+                                {
+                                    @dt.ToString("yyyy-MM-dd")
+                                }
+                                else
+                                {
+                                    @Model.Record[field.Key]
+                                }
+                            }
+                            else if (field.Value.Type == "bit" && Model.Record.ContainsKey(field.Key))
+                            {
+                                @if (Convert.ToBoolean(Model.Record[field.Key] ?? false))
+                                {
+                                    <span class="text-success">&#10003;</span> <!-- Green check -->
+                                }
+                                else
+                                {
+                                    <span class="text-danger">&#10007;</span> <!-- Red X -->
+                                }
+                            }
+                            else
+                            {
+                                @(Model.Record.ContainsKey(field.Key) ? Model.Record[field.Key] : "N/A")
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No data available to display.</p>
+}
