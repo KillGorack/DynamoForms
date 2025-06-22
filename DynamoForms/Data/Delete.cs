@@ -17,7 +17,7 @@ public class DeleteService
     public async Task DeleteRecordAsync(string tableName, int id, AppRegistry registry)
     {
         var columns = registry.Columns;
-        var pk = columns?.FirstOrDefault(c => c.IsPrimaryKey)?.ColumnName;
+        var pk = columns?.FirstOrDefault(c => c.IsPrimaryKey)?.Label;
 
         if (string.IsNullOrEmpty(pk))
         {

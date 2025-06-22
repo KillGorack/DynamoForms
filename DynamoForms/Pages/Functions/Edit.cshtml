@@ -3,47 +3,47 @@
 
 <h2>Edit Record (@Model.EditId) in @Model.TableName</h2>
 <form method="post">
-    @foreach (var col in Model.Columns.Where(c => !c.IsIdentity))
+    @foreach (var col in Model.Columns.Where(c => !c.IsPrimaryKey))
     {
         <div class="mb-2">
-            <label>@col.ColumnName</label>
-            @if (col.DataType == "bit")
+            <label>@col.Label</label>
+            @if (col.Type == "bit")
             {
                 <input type="checkbox"
-                       name="EditRecord[@col.ColumnName]"
+                       name="EditRecord[@col.Label]"
                        value="True"
-                       @(Model.EditRecord.ContainsKey(col.ColumnName) &&
-                          (Model.EditRecord[col.ColumnName] == "True" || Model.EditRecord[col.ColumnName] == "true" || Model.EditRecord[col.ColumnName] == "1")
+                       @(Model.EditRecord.ContainsKey(col.Label) &&
+                                      (Model.EditRecord[col.Label] == "True" || Model.EditRecord[col.Label] == "true" || Model.EditRecord[col.Label] == "1")
                           ? "checked" : "") />
             }
-            else if (col.DataType == "date")
+            else if (col.Type == "date")
             {
                 <input type="date"
                        class="form-control"
-                       name="EditRecord[@col.ColumnName]"
-                       value="@(Model.EditRecord.ContainsKey(col.ColumnName) && DateTime.TryParse(Model.EditRecord[col.ColumnName], out var dtVal) ? dtVal.ToString("yyyy-MM-dd") : "")" />
+                       name="EditRecord[@col.Label]"
+                       value="@(Model.EditRecord.ContainsKey(col.Label) && DateTime.TryParse(Model.EditRecord[col.Label], out var dtVal) ? dtVal.ToString("yyyy-MM-dd") : "")" />
             }
-            else if (col.DataType == "datetime")
+            else if (col.Type == "datetime")
             {
                 <input type="text"
                        class="form-control"
-                       name="EditRecord[@col.ColumnName]"
-                       value="@(Model.EditRecord.ContainsKey(col.ColumnName) ? Model.EditRecord[col.ColumnName] : "")"
+                       name="EditRecord[@col.Label]"
+                       value="@(Model.EditRecord.ContainsKey(col.Label) ? Model.EditRecord[col.Label] : "")"
                        readonly />
             }
-            else if (col.DataType == "int" || col.DataType == "bigint" || col.DataType == "smallint" || col.DataType == "tinyint")
+            else if (col.Type == "int" || col.Type == "bigint" || col.Type == "smallint" || col.Type == "tinyint")
             {
                 <input type="number"
                        class="form-control"
-                       name="EditRecord[@col.ColumnName]"
-                       value="@(Model.EditRecord.ContainsKey(col.ColumnName) ? Model.EditRecord[col.ColumnName] : "")" />
+                       name="EditRecord[@col.Label]"
+                       value="@(Model.EditRecord.ContainsKey(col.Label) ? Model.EditRecord[col.Label] : "")" />
             }
             else
             {
                 <input class="form-control"
-                       name="EditRecord[@col.ColumnName]"
-                       value="@(Model.EditRecord.ContainsKey(col.ColumnName) ? Model.EditRecord[col.ColumnName] : "")"
-                       maxlength="@col.MaxLength" />
+                       name="EditRecord[@col.Label]"
+                       value="@(Model.EditRecord.ContainsKey(col.Label) ? Model.EditRecord[col.Label] : "")"
+                       maxlength="@col.Length" />
             }
         </div>
     }

@@ -18,7 +18,7 @@ public class TableEditModel : abstract_BasePageModel
         _dbHelper = dbHelper;
     }
 
-    public List<TableColumnMeta> Columns { get; set; }
+    public List<UnifiedField> Columns { get; set; }
     public string TableName { get; set; }
     public int EditId { get; set; }
     public string Message { get; set; }
@@ -38,7 +38,7 @@ public class TableEditModel : abstract_BasePageModel
         {
             EditId = id;
 
-            var pk = Columns.FirstOrDefault(c => c.IsPrimaryKey)?.ColumnName;
+            var pk = Columns.FirstOrDefault(c => c.IsPrimaryKey)?.Label;
             if (pk != null)
             {
                 using var conn = _dbHelper.CreateConnection();
@@ -72,28 +72,28 @@ public class TableEditModel : abstract_BasePageModel
             // Set current datetime for any datetime column before saving
             foreach (var col in Columns)
             {
-                if (col.DataType == "datetime")
+                if (col.Type == "datetime")
                 {
-                    EditRecord[col.ColumnName] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+                    EditRecord[col.Label] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
                 }
             }
 
-            var pk = Columns.FirstOrDefault(c => c.IsPrimaryKey)?.ColumnName;
-            var updateCols = Columns.Where(c => !c.IsIdentity && !c.IsPrimaryKey).Select(c => c.ColumnName).ToList();
+            var pk = Columns.FirstOrDefault(c => c.IsPrimaryKey)?.Label;
+            var updateCols = Columns.Where(c => !c.IsPrimaryKey && !c.IsPrimaryKey).Select(c => c.Label).ToList();
             var setClause = string.Join(", ", updateCols.Select(c => $"[{c}] = @{c}"));
 
             var sql = $"UPDATE [{app}] SET {setClause} WHERE [{pk}] = @Id";
             var parameters = new DynamicParameters();
             foreach (var col in updateCols)
             {
-                var columnMeta = Columns.First(c => c.ColumnName == col);
-                if (columnMeta.DataType == "bit")
+                var columnMeta = Columns.First(c => c.Label == col);
+                if (columnMeta.Type == "bit")
                 {
                     var strVal = EditRecord.ContainsKey(col) ? EditRecord[col] : "False";
                     var value = strVal == "True" || strVal == "true" || strVal == "1" || strVal == "on";
                     parameters.Add("@" + col, value);
                 }
-                else if (columnMeta.DataType == "date" || columnMeta.DataType == "datetime")
+                else if (columnMeta.Type == "date" || columnMeta.Type == "datetime")
                 {
                     var strVal = EditRecord.ContainsKey(col) ? EditRecord[col] : null;
                     if (string.IsNullOrWhiteSpace(strVal) && !columnMeta.IsNullable)

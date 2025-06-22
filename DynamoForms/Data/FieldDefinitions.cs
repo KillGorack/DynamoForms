@@ -76,7 +76,7 @@ public class FieldDefinitions
                 Length = row["Length"]?.ToString(),
                 Precision = row["Precision"]?.ToString(),
                 IsUnique = Convert.ToBoolean(row["IsUnique"]),
-                Required = Convert.ToBoolean(row["Required"]),
+                IsNullable = Convert.ToBoolean(row["Required"]),
                 Enabled = Convert.ToBoolean(row["Enabled"]),
                 Label = row["Label"]?.ToString(),
                 IsOption = Convert.ToBoolean(row["IsOption"]),
@@ -103,21 +103,20 @@ public class FieldDefinitions
         return fields;
     }
 
-    public List<TableColumnMeta> ToColumnMeta(Dictionary<string, UnifiedField> fields)
+    public List<UnifiedField> ToColumnMeta(Dictionary<string, UnifiedField> fields)
     {
-        if (fields == null) return new List<TableColumnMeta>();
+        if (fields == null) return new List<UnifiedField>();
 
         // Map the UnifiedField data to TableColumnMeta using the fld table data
         return fields.Values.Select(f =>
         {
-            return new TableColumnMeta
+            return new UnifiedField
             {
-                ColumnName = f.Name, // fld_column
-                DataType = f.Type, // fld_type
-                IsNullable = f.Required ? false : true, // fld_required
-                IsIdentity = f.IsIdentity, // fld_usr_ID (or similar)
+                Label = f.Name, // fld_column
+                Type = f.Type, // fld_type
+                IsNullable = f.IsNullable ? false : true, // fld_required
                 IsPrimaryKey = f.Name.Equals("ID", StringComparison.OrdinalIgnoreCase),
-                MaxLength = int.TryParse(f.Length, out var len) ? len : null // fld_length
+                Length = f.Length
             };
         }).ToList();
     }

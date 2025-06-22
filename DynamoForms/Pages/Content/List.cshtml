@@ -50,15 +50,15 @@
                 {
                     <th>
                         @{
-                            var filterVal = Request.Query[$"filter_{col.ColumnName}"];
+                            var filterVal = Request.Query[$"filter_{col.Label}"];
                         }
-                        @if (col.DataType == "date")
+                        @if (col.Type == "date")
                         {
-                            <input type="date" name="filter_@col.ColumnName" value="@filterVal" class="form-control form-control-sm" />
+                            <input type="date" name="filter_@col.Label" value="@filterVal" class="form-control form-control-sm" />
                         }
-                        else if (col.DataType == "bit")
+                        else if (col.Type == "bit")
                         {
-                            <select name="filter_@col.ColumnName" class="form-select form-select-sm">
+                            <select name="filter_@col.Label" class="form-select form-select-sm">
                                 @if (string.IsNullOrEmpty(filterVal))
                                 {
                                     <option value="" selected>All</option>
@@ -87,7 +87,7 @@
                         }
                         else
                         {
-                            <input type="text" name="filter_@col.ColumnName" value="@filterVal" class="form-control form-control-sm" />
+                            <input type="text" name="filter_@col.Label" value="@filterVal" class="form-control form-control-sm" />
                         }
                     </th>
                 }
@@ -98,7 +98,7 @@
             <tr>
                 @foreach (var col in Model.Columns.Where(c => !c.IsPrimaryKey)) // Exclude primary key column
                 {
-                    var isSorted = Model.SortColumn == col.ColumnName;
+                    var isSorted = Model.SortColumn == col.Label;
                     var nextSortDesc = isSorted ? !Model.SortDescending : false;
                     var sortIcon = isSorted
                         ? (Model.SortDescending ? "&#8595;" : "&#8593;")
@@ -108,10 +108,10 @@
                         <a asp-page="/Content/List"
                            asp-route-app="@Model.TableName"
                            asp-route-pageNumber="@Model.PageNumber"
-                           asp-route-sortColumn="@col.ColumnName"
+                           asp-route-sortColumn="@col.Label"
                            asp-route-sortDesc="@nextSortDesc"
                            style="text-decoration:none;">
-                            @col.ColumnName @Html.Raw(sortIcon)
+                            @col.Label @Html.Raw(sortIcon)
                         </a>
                     </th>
                 }
@@ -122,7 +122,7 @@
 <tbody>
     @foreach (var record in Model.Records)
     {
-        var primaryKey = Model.Columns.First(c => c.IsPrimaryKey).ColumnName; // Get the primary key column name
+        var primaryKey = Model.Columns.First(c => c.IsPrimaryKey).Label; // Get the primary key column name
         var recordId = record[primaryKey]; // Get the primary key value for the current record
 
         <tr onclick="window.location.href='@Url.Page("/Content/Detail", new { id = recordId, app = Model.TableName })'" style="cursor: pointer;">
@@ -130,8 +130,8 @@
             {
                 <td>
                     @{
-                        var value = record.ContainsKey(col.ColumnName) ? record[col.ColumnName] : "";
-                        if (col.DataType == "date" && value is not null && value.ToString() != "")
+                        var value = record.ContainsKey(col.Label) ? record[col.Label] : "";
+                        if (col.Type == "date" && value is not null && value.ToString() != "")
                         {
                             DateTime dt;
                             if (DateTime.TryParse(value.ToString(), out dt))
@@ -143,7 +143,7 @@
                                 @value
                             }
                         }
-                        else if (col.DataType == "bit")
+                        else if (col.Type == "bit")
                         {
                             // Replace checkbox with visual indicators
                             if (Convert.ToBoolean(value ?? false))

@@ -10,7 +10,7 @@
         public string Length { get; set; } // fld_length
         public string Precision { get; set; } // fld_precision
         public bool IsUnique { get; set; } // fld_unique
-        public bool Required { get; set; } // fld_required
+        public bool IsNullable { get; set; } // fld_nullable (replaces Required)
         public bool Enabled { get; set; } // fld_enable
         public bool IsOption { get; set; } // fld_opt
         public string IconSet { get; set; } // fld_icon_set
@@ -30,6 +30,6 @@
         public bool IsTime { get; set; } // fld_time
         public bool IsImage { get; set; } // fld_image
         public bool IsJson { get; set; } // fld_json
-        public bool IsIdentity { get; set; } // NEW: for identity/auto-increment
+        public bool IsPrimaryKey { get; set; } // Combines IsIdentity and IsPrimaryKey
     }
 }

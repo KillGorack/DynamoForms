@@ -78,7 +78,7 @@ namespace DynamoForms.Data
             }
         }
 
-        public async Task<List<TableColumnMeta>> GetTableMetaAsync(string tableName)
+        public async Task<List<UnifiedField>> GetTableMetaAsync(string tableName)
         {
             var sql = @"
                 SELECT 
@@ -103,13 +103,13 @@ namespace DynamoForms.Data
             ";
 
             using var conn = CreateConnection();
-            var meta = await conn.QueryAsync<TableColumnMeta>(sql, new { TableName = tableName });
+            var meta = await conn.QueryAsync<UnifiedField>(sql, new { TableName = tableName });
 
             return meta.ToList();
         }
 
         public async Task<int> GetFilteredRecordCountAsync(
-            string tableName, Dictionary<string, string> filters, List<TableColumnMeta> columns)
+            string tableName, Dictionary<string, string> filters, List<UnifiedField> columns)
         {
             using var conn = CreateConnection();
             var whereClauses = new List<string>();
@@ -118,8 +118,8 @@ namespace DynamoForms.Data
             {
                 if (!string.IsNullOrWhiteSpace(filter.Value))
                 {
-                    var columnMeta = columns.FirstOrDefault(c => c.ColumnName == filter.Key);
-                    if (columnMeta != null && columnMeta.DataType == "bit")
+                    var columnMeta = columns.FirstOrDefault(c => c.Label == filter.Key);
+                    if (columnMeta != null && columnMeta.Type == "bit")
                     {
                         if (filter.Value == "true" || filter.Value == "false")
                         {
@@ -148,7 +148,7 @@ namespace DynamoForms.Data
         }
 
         public async Task<List<Dictionary<string, object>>> GetPagedRecordsAsync(
-            string tableName, int pageNumber, int pageSize, string sortColumn, bool sortDescending, Dictionary<string, string> filters, List<TableColumnMeta> columns)
+            string tableName, int pageNumber, int pageSize, string sortColumn, bool sortDescending, Dictionary<string, string> filters, List<UnifiedField> columns)
         {
             using var conn = CreateConnection();
             var offset = (pageNumber - 1) * pageSize;
@@ -162,8 +162,8 @@ namespace DynamoForms.Data
             {
                 if (!string.IsNullOrWhiteSpace(filter.Value))
                 {
-                    var columnMeta = columns.FirstOrDefault(c => c.ColumnName == filter.Key);
-                    if (columnMeta != null && columnMeta.DataType == "bit")
+                    var columnMeta = columns.FirstOrDefault(c => c.Label == filter.Key);
+                    if (columnMeta != null && columnMeta.Type == "bit")
                     {
                         // Only filter if value is "true" or "false"
                         if (filter.Value == "true" || filter.Value == "false")

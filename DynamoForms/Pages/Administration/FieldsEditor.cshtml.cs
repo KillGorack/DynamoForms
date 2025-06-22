@@ -77,13 +77,13 @@ namespace DynamoForms.Pages.Administration
                     var insertParameters = new
                     {
                         AppId = _appId,
-                        HumanName = field.ColumnName,
-                        ColumnName = field.ColumnName,
+                        HumanName = field.Label,
+                        ColumnName = field.Label,
                         Enabled = false,
-                        Type = field.DataType,
-                        Length = field.MaxLength?.ToString(),
+                        Type = field.Type,
+                        Length = field.Length?.ToString(),
                         Precision = (string)null,
-                        Required = field.Required,
+                        Required = field.IsNullable,
                     };
 
                     await _databaseHelper.ExecuteAsync(sqlInsert, insertParameters);
@@ -111,7 +111,7 @@ namespace DynamoForms.Pages.Administration
                 Type = row.ContainsKey("fld_type") ? row["fld_type"]?.ToString() : null,
                 Length = row.ContainsKey("fld_length") ? row["fld_length"]?.ToString() : null,
                 Precision = row.ContainsKey("fld_precision") ? row["fld_precision"]?.ToString() : null,
-                Required = row.ContainsKey("fld_required") && row["fld_required"] is bool required ? required : false,
+                IsNullable = row.ContainsKey("fld_required") && row["fld_required"] is bool required ? required : false,
                 IsOption = row.ContainsKey("fld_opt") && row["fld_opt"] is bool opt ? opt : false,
                 IconSet = row.ContainsKey("fld_icon_set") ? row["fld_icon_set"]?.ToString() : null,
                 Regex = row.ContainsKey("fld_regex") ? row["fld_regex"]?.ToString() : null,

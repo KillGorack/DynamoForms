@@ -24,7 +24,7 @@ public class TableListModel : abstract_BasePageModel
 
     public List<string> TableNames { get; set; }
     public string TableName { get; set; }
-    public List<TableColumnMeta> Columns { get; set; }
+    public List<UnifiedField> Columns { get; set; }
     public Dictionary<string, UnifiedField> Fields { get; set; }
     public List<Dictionary<string, object>> Records { get; set; }
     public int PageNumber { get; set; } = 1;

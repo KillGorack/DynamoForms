@@ -8,6 +8,6 @@ namespace DynamoForms.Data
         public Dictionary<string, object> ValidatedQuery { get; set; }
         public Dictionary<string, object> Settings { get; set; }
         public Dictionary<string, UnifiedField> Fields { get; set; }
-        public List<TableColumnMeta> Columns { get; set; } // <-- Add this
+        public List<UnifiedField> Columns { get; set; } // <-- Add this
     }
 }
